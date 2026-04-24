@@ -1,4 +1,4 @@
-FROM php:8.4-fpm-alpine AS base
+FROM php:8.4-fpm-alpine@sha256:c16cd1d4efc6a275fe0f039c7bbfcb57dc2577782fb94e3fe387ce0d7e62b7ac AS base
 
 RUN apk add --no-cache \
     nginx \
@@ -15,7 +15,7 @@ RUN apk add --no-cache \
         gd \
         opcache
 
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2@sha256:dc292c5c0f95f526b051d4c341bf08e7e2b18504c74625e3203d7f123050e318 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 

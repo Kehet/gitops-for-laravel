@@ -15,9 +15,9 @@ jobs:
     name: Pint + PHPUnit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
         with:
           php-version: '8.4'
           extensions: mbstring, zip, gd, pdo_mysql, opcache
@@ -25,7 +25,7 @@ jobs:
           coverage: none
 
       - name: Cache Composer dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ~/.composer/cache
           key: composer-${{ hashFiles('composer.lock') }}
@@ -51,16 +51,16 @@ jobs:
       contents: read
       security-events: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
         with:
           php-version: '8.4'
           tools: composer:v2
           coverage: none
 
       - name: Cache Composer dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ~/.composer/cache
           key: composer-${{ hashFiles('composer.lock') }}
@@ -82,22 +82,22 @@ jobs:
       security-events: write
       id-token: write          # cosign keyless OIDC signing
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Lowercase image name
         id: img
         run: echo "repo=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
-      - uses: docker/setup-buildx-action@v4
+      - uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
-      - uses: docker/login-action@v4
+      - uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - id: meta
-        uses: docker/metadata-action@v6
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
         with:
           images: ghcr.io/${{ steps.img.outputs.repo }}
           tags: |
@@ -110,7 +110,7 @@ jobs:
             type=sha,prefix=sha-
 
       - id: build
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
           context: .
           target: production
@@ -122,7 +122,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Install cosign
-        uses: sigstore/cosign-installer@v3
+        uses: sigstore/cosign-installer@398d4b0eeef1380460a10c8013a76f728fb906ac # v3.10.1
 
       - name: Sign image
         run: |
@@ -130,7 +130,7 @@ jobs:
             ghcr.io/${{ steps.img.outputs.repo }}@${{ steps.build.outputs.digest }}
 
       - name: Trivy vulnerability scan
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ghcr.io/${{ steps.img.outputs.repo }}@${{ steps.build.outputs.digest }}
           format: sarif
@@ -141,6 +141,6 @@ jobs:
 
       - name: Upload Trivy results to Security tab
         if: always()
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
         with:
           sarif_file: trivy-results.sarif
